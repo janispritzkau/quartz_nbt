@@ -1,12 +1,12 @@
 use crate::{
     raw,
+    map::Map,
     snbt::{self, SnbtError},
     NbtReprError,
     NbtStructureError,
 };
 use std::{
     borrow::{Borrow, BorrowMut, Cow},
-    collections::HashMap,
     convert::{AsMut, AsRef, TryFrom},
     fmt::{self, Debug, Display, Formatter},
     hash::Hash,
@@ -974,37 +974,37 @@ impl IndexMut<usize> for NbtList {
 /// [`io`]: crate::io
 #[repr(transparent)]
 #[derive(Clone, PartialEq)]
-pub struct NbtCompound(pub(crate) HashMap<String, NbtTag>);
+pub struct NbtCompound(pub(crate) Map<String, NbtTag>);
 
 impl NbtCompound {
     /// Returns a new NBT tag compound with an empty internal hash map.
     #[inline]
     pub fn new() -> Self {
-        NbtCompound(HashMap::new())
+        NbtCompound(Map::new())
     }
 
     /// Returns a reference to the internal hash map of this compound.
     #[inline]
-    pub fn inner(&self) -> &HashMap<String, NbtTag> {
+    pub fn inner(&self) -> &Map<String, NbtTag> {
         &self.0
     }
 
     /// Returns a mutable reference to the internal hash map of this compound.
     #[inline]
-    pub fn inner_mut(&mut self) -> &mut HashMap<String, NbtTag> {
+    pub fn inner_mut(&mut self) -> &mut Map<String, NbtTag> {
         &mut self.0
     }
 
     /// Returns the internal hash map of this NBT compound.
     #[inline]
-    pub fn into_inner(self) -> HashMap<String, NbtTag> {
+    pub fn into_inner(self) -> Map<String, NbtTag> {
         self.0
     }
 
     /// Returns a new NBT tag compound with the given initial capacity.
     #[inline]
     pub fn with_capacity(capacity: usize) -> Self {
-        NbtCompound(HashMap::with_capacity(capacity))
+        NbtCompound(Map::with_capacity(capacity))
     }
 
     /// Clones the data in the given map and converts it into an [`NbtCompound`](crate::tag::NbtCompound).
@@ -1013,8 +1013,8 @@ impl NbtCompound {
     ///
     /// ```
     /// # use quartz_nbt::NbtCompound;
-    /// # use std::collections::HashMap;
-    /// let mut map = HashMap::new();
+    /// # use std::collections::Map;
+    /// let mut map = Map::new();
     /// map.insert("foo", 10i32);
     /// map.insert("bar", -5i32);
     ///
@@ -1272,7 +1272,7 @@ impl Default for NbtCompound {
 }
 
 impl IntoIterator for NbtCompound {
-    type IntoIter = <HashMap<String, NbtTag> as IntoIterator>::IntoIter;
+    type IntoIter = <Map<String, NbtTag> as IntoIterator>::IntoIter;
     type Item = (String, NbtTag);
 
     #[inline]
@@ -1282,7 +1282,7 @@ impl IntoIterator for NbtCompound {
 }
 
 impl<'a> IntoIterator for &'a NbtCompound {
-    type IntoIter = <&'a HashMap<String, NbtTag> as IntoIterator>::IntoIter;
+    type IntoIter = <&'a Map<String, NbtTag> as IntoIterator>::IntoIter;
     type Item = (&'a String, &'a NbtTag);
 
     #[inline]
@@ -1292,7 +1292,7 @@ impl<'a> IntoIterator for &'a NbtCompound {
 }
 
 impl<'a> IntoIterator for &'a mut NbtCompound {
-    type IntoIter = <&'a mut HashMap<String, NbtTag> as IntoIterator>::IntoIter;
+    type IntoIter = <&'a mut Map<String, NbtTag> as IntoIterator>::IntoIter;
     type Item = (&'a String, &'a mut NbtTag);
 
     #[inline]
@@ -1304,7 +1304,7 @@ impl<'a> IntoIterator for &'a mut NbtCompound {
 impl FromIterator<(String, NbtTag)> for NbtCompound {
     #[inline]
     fn from_iter<T: IntoIterator<Item = (String, NbtTag)>>(iter: T) -> Self {
-        NbtCompound(HashMap::from_iter(iter))
+        NbtCompound(Map::from_iter(iter))
     }
 }
 
@@ -1478,8 +1478,8 @@ mod serde_impl {
         fn visit_map<A>(self, mut map: A) -> Result<Self::Value, A::Error>
         where A: MapAccess<'de> {
             let mut dest = match map.size_hint() {
-                Some(hint) => HashMap::with_capacity(hint),
-                None => HashMap::new(),
+                Some(hint) => Map::with_capacity(hint),
+                None => Map::new(),
             };
             while let Some((key, tag)) = map.next_entry::<String, NbtTag>()? {
                 dest.insert(key, tag);

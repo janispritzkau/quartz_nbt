@@ -189,6 +189,7 @@ assert_eq!(compound, snbt::parse(SNBT).unwrap());
 pub mod io;
 mod raw;
 mod repr;
+mod map;
 /// When the `serde` feature is enabled, this module provides `Serializer` and `Deserializer`
 /// implementations to link this crate into the serde data model.
 ///
